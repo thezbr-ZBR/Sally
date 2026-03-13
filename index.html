@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sally's Workouts">
+<title>Sally's Workouts 💪</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2d7a4f;
+    --green-mid: #3d9960;
+    --green-light: #e8f5ee;
+    --green-pale: #f2faf6;
+    --gold: #e8a020;
+    --gold-light: #fef3dc;
+    --red: #e05050;
+    --blue: #3a6ea8;
+    --blue-light: #eef3fa;
+    --bg: #f5f7f5;
+    --white: #ffffff;
+    --text: #1a2e1a;
+    --text-mid: #4a5e4a;
+    --text-light: #7a907a;
+    --border: #dce8dc;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow: 0 4px 20px rgba(0,0,0,0.10);
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    font-family:'Nunito',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    max-width:500px;
+    margin:0 auto;
+    overflow-x:hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background:linear-gradient(135deg,var(--green) 0%,#1a5c38 100%);
+    padding:52px 24px 28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .header::before {
+    content:'';position:absolute;top:-60px;right:-60px;
+    width:240px;height:240px;background:rgba(255,255,255,0.06);border-radius:50%;
+  }
+  .header-left { max-width:calc(100% - 100px); }
+  .header-greeting { color:rgba(255,255,255,0.75);font-size:1rem;font-weight:600;letter-spacing:0.03em; }
+  .header-name { color:#fff;font-size:2.1rem;font-weight:900;line-height:1.1;margin-top:2px; }
+  .header-date { color:rgba(255,255,255,0.65);font-size:0.85rem;font-weight:600;margin-top:6px; }
+  .header-streak {
+    margin-top:12px;
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--gold);color:#fff;
+    font-size:0.85rem;font-weight:800;
+    padding:6px 14px;border-radius:30px;
+    box-shadow:0 3px 12px rgba(232,160,32,0.4);
+  }
+
+  /* AVATAR */
+  .header-avatar-wrap {
+    position:absolute;top:44px;right:20px;
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+  }
+  .header-avatar {
+    width:74px;height:74px;border-radius:50%;
+    border:3px solid rgba(255,255,255,0.7);
+    object-fit:cover;overflow:hidden;
+    box-shadow:0 4px 18px rgba(0,0,0,0.25);
+    display:block;
+  }
+  .avatar-tap-hint {
+    color:rgba(255,255,255,0.55);font-size:0.58rem;font-weight:700;
+    letter-spacing:0.05em;text-transform:uppercase;text-align:center;cursor:pointer;
+  }
+  #avatarInput { display:none; }
+
+  /* NAV */
+  .nav {
+    display:flex;background:var(--white);
+    border-bottom:2px solid var(--border);
+    position:sticky;top:0;z-index:100;
+    box-shadow:var(--shadow-sm);
+  }
+  .nav-btn {
+    flex:1;padding:13px 4px 11px;text-align:center;
+    font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:700;
+    color:var(--text-light);background:none;border:none;
+    border-bottom:3px solid transparent;cursor:pointer;
+    transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:3px;
+  }
+  .nav-btn .ni { font-size:1.25rem; }
+  .nav-btn.active { color:var(--green);border-bottom-color:var(--green); }
+
+  /* PANELS */
+  .panel { display:none;padding:20px 16px 110px; }
+  .panel.active { display:block;animation:fadeUp 0.25s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* PANEL TITLE */
+  .panel-title { font-size:1.5rem;font-weight:900;color:var(--green);margin-bottom:18px; }
+
+  /* TODAY */
+  .today-header { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px; }
+  .today-title { font-size:1.45rem;font-weight:900;color:var(--green);line-height:1.2; }
+  .today-subtitle { font-size:0.85rem;color:var(--text-light);font-weight:600;margin-top:3px; }
+  .workout-tag {
+    font-size:0.75rem;font-weight:800;padding:5px 12px;border-radius:20px;
+    text-align:right;max-width:120px;line-height:1.3;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap {
+    background:var(--white);border-radius:var(--radius);
+    padding:16px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm);
+  }
+  .progress-bar-top { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px; }
+  .progress-bar-label { font-size:0.85rem;font-weight:700;color:var(--text-mid); }
+  .progress-bar-pct { font-size:1.1rem;font-weight:900;color:var(--green); }
+  .progress-bar-track { height:12px;background:var(--green-light);border-radius:10px;overflow:hidden; }
+  .progress-bar-fill {
+    height:100%;background:linear-gradient(90deg,var(--green-mid),var(--green));
+    border-radius:10px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size:0.75rem;font-weight:800;letter-spacing:0.08em;
+    text-transform:uppercase;color:var(--text-light);margin:20px 0 10px 4px;
+  }
+
+  /* EXERCISE CARD */
+  .ex-card {
+    background:var(--white);border-radius:var(--radius);
+    padding:18px 18px 14px;margin-bottom:12px;
+    box-shadow:var(--shadow-sm);border-left:5px solid var(--border);
+    transition:all 0.3s ease;
+  }
+  .ex-card.section-warmup { border-left-color:var(--gold); }
+  .ex-card.section-main { border-left-color:var(--green-mid); }
+  .ex-card.section-cooldown { border-left-color:var(--blue); }
+  .ex-card.all-done { background:var(--green-pale);border-left-color:var(--green);opacity:0.75; }
+  .ex-name { font-size:1.05rem;font-weight:800;color:var(--text);line-height:1.3; }
+  .ex-card.all-done .ex-name { text-decoration:line-through;color:var(--text-light); }
+  .ex-machine { font-size:0.78rem;font-weight:600;color:var(--text-light);margin-top:3px;font-style:italic; }
+  .ex-meta { display:flex;gap:8px;flex-wrap:wrap;margin-top:12px; }
+  .pill { font-size:0.8rem;font-weight:700;padding:5px 12px;border-radius:20px; }
+  .pill-sets { background:var(--gold-light);color:#9a6810; }
+  .pill-reps { background:var(--green-light);color:var(--green); }
+  .pill-weight { background:var(--blue-light);color:var(--blue);cursor:pointer; }
+  .pill-weight::after { content:' ✏️';font-size:0.7rem; }
+  .last-weight {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-light);
+    background: #f0f0f0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-top: 8px;
+  }
+  .last-weight .arrow {
+    color: var(--green);
+    font-weight: 900;
+    font-size: 0.85rem;
+  }
+  .last-weight.heavier { background: var(--green-light); color: var(--green); }
+  .last-weight.same { background: #f0f0f0; color: var(--text-light); }
+
+  /* WEIGHT EDIT */
+  .weight-edit-row {
+    display:none;align-items:center;gap:10px;margin-top:10px;
+    background:var(--blue-light);border-radius:var(--radius-sm);padding:10px 14px;
+  }
+  .weight-edit-row.show { display:flex; }
+  .weight-edit-row label { font-size:0.85rem;font-weight:700;color:var(--blue);white-space:nowrap; }
+  .weight-input {
+    font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;
+    width:90px;padding:6px 10px;border:2px solid var(--blue);
+    border-radius:10px;color:var(--blue);background:white;text-align:center;
+  }
+  .weight-save-btn {
+    background:var(--blue);color:white;border:none;border-radius:10px;
+    padding:6px 14px;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:800;cursor:pointer;
+  }
+
+  /* SET CHECKS */
+  .set-checks { display:flex;gap:8px;flex-wrap:wrap;margin-top:12px; }
+  .set-check { display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer; }
+  .set-check-label { font-size:0.68rem;font-weight:700;color:var(--text-light); }
+  .set-box {
+    width:48px;height:48px;border:3px solid var(--border);border-radius:12px;
+    background:white;display:flex;align-items:center;justify-content:center;
+    font-size:1.5rem;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);user-select:none;
+  }
+  .set-box:active { transform:scale(0.88); }
+  .set-check.checked .set-box {
+    background:var(--green);border-color:var(--green);
+    box-shadow:0 3px 12px rgba(45,122,79,0.35);
+  }
+  .set-check.checked .set-box::after { content:'✓';color:white;font-weight:900;font-size:1.3rem; }
+  .set-check.checked .set-check-label { color:var(--green); }
+
+  /* SINGLE CHECK */
+  .single-check { display:flex;align-items:center;gap:12px;margin-top:12px;cursor:pointer; }
+  .single-check-box {
+    width:48px;height:48px;border:3px solid var(--border);border-radius:12px;
+    background:white;display:flex;align-items:center;justify-content:center;
+    transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);flex-shrink:0;
+  }
+  .single-check.checked .single-check-box {
+    background:var(--gold);border-color:var(--gold);
+    box-shadow:0 3px 12px rgba(232,160,32,0.35);
+  }
+  .single-check.checked .single-check-box::after { content:'✓';color:white;font-weight:900;font-size:1.3rem; }
+  .single-check-label { font-size:0.95rem;font-weight:700;color:var(--text-mid); }
+  .single-check.checked .single-check-label { color:var(--gold);text-decoration:line-through; }
+
+  /* TIP */
+  .ex-tip {
+    font-size:0.85rem;color:var(--text-light);font-weight:600;
+    margin-top:12px;padding-top:12px;
+    border-top:1.5px dashed var(--border);line-height:1.55;
+  }
+  .ex-tip strong { color:var(--green);font-weight:800; }
+
+  /* CELEBRATE */
+  .celebrate-card {
+    background:linear-gradient(135deg,var(--green),#1a5c38);
+    border-radius:var(--radius);padding:28px 24px;text-align:center;
+    color:white;margin-bottom:16px;display:none;
+    animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .celebrate-card.show { display:block; }
+  @keyframes popIn { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+  .celebrate-card .big-emoji { font-size:3rem;margin-bottom:8px; }
+  .celebrate-card h2 { font-size:1.6rem;font-weight:900;margin-bottom:8px; }
+  .celebrate-card p { font-size:0.95rem;opacity:0.85;font-weight:600; }
+
+  /* REST DAY */
+  .rest-card {
+    background:var(--white);border-radius:var(--radius);
+    padding:40px 24px;text-align:center;box-shadow:var(--shadow-sm);margin-top:8px;
+  }
+  .rest-card .big-emoji { font-size:3.5rem;margin-bottom:14px; }
+  .rest-card h2 { font-size:1.5rem;font-weight:900;color:var(--green);margin-bottom:10px; }
+  .rest-card p { font-size:0.95rem;color:var(--text-light);font-weight:600;line-height:1.6;max-width:300px;margin:0 auto; }
+
+  /* TIMER FAB */
+  .timer-fab {
+    position:fixed;bottom:90px;right:20px;
+    width:64px;height:64px;background:var(--green);color:white;
+    border:none;border-radius:50%;cursor:pointer;
+    box-shadow:0 4px 20px rgba(45,122,79,0.45);z-index:200;
+    display:none;align-items:center;justify-content:center;
+    flex-direction:column;font-family:'Nunito',sans-serif;font-weight:900;transition:transform 0.15s;
+  }
+  .timer-fab.visible { display:flex; }
+  .timer-fab:active { transform:scale(0.93); }
+  .timer-fab-icon { font-size:1.3rem; }
+  .timer-fab-label { font-size:0.58rem;font-weight:800;letter-spacing:0.03em; }
+
+  /* TIMER MODAL */
+  .timer-modal {
+    position:fixed;inset:0;background:rgba(0,0,0,0.55);
+    z-index:300;display:none;align-items:flex-end;justify-content:center;
+  }
+  .timer-modal.show { display:flex; }
+  .timer-sheet {
+    background:white;border-radius:28px 28px 0 0;
+    padding:28px 24px 48px;width:100%;max-width:500px;
+    text-align:center;animation:slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .timer-sheet h2 { font-size:1.2rem;font-weight:900;color:var(--text);margin-bottom:4px; }
+  .timer-sub { font-size:0.85rem;color:var(--text-light);font-weight:600;margin-bottom:22px; }
+  .timer-display { font-size:5rem;font-weight:900;color:var(--green);line-height:1;margin-bottom:6px;letter-spacing:-0.02em; }
+  .timer-display.warning { color:var(--red); }
+  .timer-phase { font-size:0.9rem;font-weight:700;color:var(--text-light);margin-bottom:26px; }
+  .timer-presets { display:flex;gap:10px;justify-content:center;margin-bottom:20px;flex-wrap:wrap; }
+  .timer-preset-btn {
+    background:var(--green-light);color:var(--green);border:none;border-radius:30px;
+    padding:10px 20px;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:800;cursor:pointer;
+  }
+  .timer-preset-btn.active-preset { background:var(--green);color:white; }
+  .timer-controls { display:flex;gap:12px;justify-content:center; }
+  .timer-btn {
+    flex:1;max-width:160px;padding:16px;border:none;border-radius:var(--radius-sm);
+    font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;
+  }
+  .timer-btn-start { background:var(--green);color:white; }
+  .timer-btn-reset { background:var(--green-light);color:var(--green); }
+  .timer-close { background:none;border:none;color:var(--text-light);font-size:0.9rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:16px;padding:8px; }
+
+  /* HISTORY */
+  .stats-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px; }
+  .stat-box { background:white;border-radius:var(--radius-sm);padding:16px 10px;text-align:center;box-shadow:var(--shadow-sm); }
+  .stat-num { font-size:2rem;font-weight:900;color:var(--green);line-height:1; }
+  .stat-label { font-size:0.72rem;font-weight:700;color:var(--text-light);margin-top:4px; }
+  .calendar-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:8px; }
+  .cal-day-name { text-align:center;font-size:0.65rem;font-weight:800;color:var(--text-light);padding:4px 0; }
+  .cal-day {
+    aspect-ratio:1;border-radius:8px;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.72rem;font-weight:700;color:var(--text-light);
+  }
+  .cal-day.workout-done { background:var(--green);color:white; }
+  .cal-day.rest-day { background:var(--gold-light);color:#9a6810; }
+  .cal-day.today { outline:3px solid var(--green);outline-offset:2px;color:var(--green);font-weight:900; }
+  .cal-day.today.workout-done { color:white; }
+  .cal-day.future { opacity:0.3; }
+  .cal-month-label { font-size:0.8rem;font-weight:800;color:var(--text-mid);margin-bottom:8px;margin-top:16px; }
+  .history-entry {
+    background:white;border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;
+    box-shadow:var(--shadow-sm);display:flex;justify-content:space-between;align-items:center;
+  }
+  .history-entry-info h4 { font-size:0.95rem;font-weight:800;color:var(--text); }
+  .history-entry-info p { font-size:0.8rem;font-weight:600;color:var(--text-light);margin-top:2px; }
+
+  /* PLAN */
+  .plan-day-card { background:white;border-radius:var(--radius);margin-bottom:12px;box-shadow:var(--shadow-sm);overflow:hidden; }
+  .plan-day-header { padding:16px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none; }
+  .plan-day-header.day-A { background:linear-gradient(90deg,#e8f5ee,#f5fbf7);border-left:5px solid var(--green); }
+  .plan-day-header.day-B { background:linear-gradient(90deg,#fef3dc,#fdfaf5);border-left:5px solid var(--gold); }
+  .plan-day-header.day-C { background:linear-gradient(90deg,#eef3fa,#f5f8fd);border-left:5px solid var(--blue); }
+  .plan-day-header.day-rest { background:linear-gradient(90deg,#f5f7f5,#fafafa);border-left:5px solid var(--border); }
+  .plan-day-name { font-size:1rem;font-weight:900;color:var(--text); }
+  .plan-day-focus { font-size:0.78rem;font-weight:600;color:var(--text-light);margin-top:2px; }
+  .plan-chevron { font-size:1.2rem;transition:transform 0.2s; }
+  .plan-day-card.open .plan-chevron { transform:rotate(180deg); }
+  .plan-exercises { display:none;padding:0 18px 16px; }
+  .plan-day-card.open .plan-exercises { display:block; }
+  .plan-ex-row { padding:10px 0;border-bottom:1.5px dashed var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px; }
+  .plan-ex-row:last-child { border-bottom:none; }
+  .plan-ex-name { font-size:0.9rem;font-weight:700;color:var(--text);flex:1; }
+  .plan-ex-machine { font-size:0.75rem;font-weight:600;color:var(--text-light);font-style:italic;margin-top:2px; }
+  .plan-ex-detail { font-size:0.8rem;font-weight:700;color:var(--text-light);white-space:nowrap; }
+
+  /* NOTIFICATIONS */
+  .notif-card { background:white;border-radius:var(--radius);padding:22px 20px;margin-bottom:14px;box-shadow:var(--shadow-sm); }
+  .notif-card h3 { font-size:1.05rem;font-weight:900;color:var(--green);margin-bottom:16px;display:flex;align-items:center;gap:8px; }
+  .notif-row { display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1.5px dashed var(--border); }
+  .notif-row:last-of-type { border-bottom:none;padding-bottom:0; }
+  .notif-row-label { font-size:1rem;font-weight:700;color:var(--text-mid); }
+  .notif-row-sub { font-size:0.78rem;font-weight:600;color:var(--text-light);margin-top:3px; }
+  .toggle {
+    position:relative;width:54px;height:32px;background:var(--border);
+    border-radius:16px;cursor:pointer;border:none;transition:background 0.2s;flex-shrink:0;
+  }
+  .toggle.on { background:var(--green); }
+  .toggle::after {
+    content:'';position:absolute;top:4px;left:4px;
+    width:24px;height:24px;background:white;border-radius:50%;
+    transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  }
+  .toggle.on::after { transform:translateX(22px); }
+  .time-picker {
+    font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;
+    color:var(--green);background:var(--green-light);
+    border:2px solid transparent;border-radius:10px;padding:8px 12px;cursor:pointer;
+  }
+  .time-picker:focus { outline:none;border-color:var(--green); }
+  .notif-status {
+    background:var(--green-light);color:var(--green);border-radius:var(--radius-sm);
+    padding:12px 16px;font-size:0.88rem;font-weight:700;margin-top:16px;line-height:1.6;display:none;
+  }
+  .notif-status.show { display:block; }
+  .notif-note {
+    background:var(--gold-light);color:#8a6010;border-radius:var(--radius-sm);
+    padding:12px 16px;font-size:0.85rem;font-weight:600;margin-top:12px;line-height:1.55;
+  }
+
+  /* TIPS */
+  .tip-card { background:white;border-radius:var(--radius);padding:20px;margin-bottom:12px;box-shadow:var(--shadow-sm); }
+  .tip-card h3 { font-size:1.05rem;font-weight:900;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:8px; }
+  .tip-card ul { padding-left:4px;list-style:none; }
+  .tip-card li { font-size:0.92rem;font-weight:600;color:var(--text-mid);padding:5px 0;padding-left:20px;position:relative;line-height:1.5; }
+  .tip-card li::before { content:'•';position:absolute;left:6px;color:var(--green);font-weight:900; }
+  .tip-card p { font-size:0.92rem;font-weight:600;color:var(--text-mid);line-height:1.6; }
+
+  /* REFERENCE ROWS */
+  .ref-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 18px;
+    border-bottom: 1.5px dashed var(--border);
+  }
+  .ref-row:last-child { border-bottom: none; }
+  .ref-row.ref-warmup { background: #fffdf5; }
+  .ref-row.ref-cooldown { background: #f5f8ff; }
+  .ref-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+  .ref-name { font-size: 0.95rem; font-weight: 800; color: var(--text); line-height: 1.3; }
+  .ref-detail { font-size: 0.78rem; font-weight: 600; color: var(--text-light); margin-top: 3px; }
+
+  /* DEMO MODE */
+  .demo-banner {
+    background: #1a2e1a; color: rgba(255,255,255,0.9);
+    border-radius: var(--radius-sm); padding: 11px 16px;
+    font-size: 0.8rem; font-weight: 700;
+    margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .demo-banner span { color: var(--gold); }
+  .demo-exit-btn {
+    background: var(--gold); color: white; border: none; border-radius: 20px;
+    padding: 7px 14px; font-family: 'Nunito', sans-serif;
+    font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .preview-workout-btn {
+    display: block; width: 100%; margin-top: 20px; padding: 18px;
+    background: white; border: 2.5px dashed var(--border);
+    border-radius: var(--radius); font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 800; color: var(--green);
+    cursor: pointer; text-align: center; transition: all 0.2s;
+  }
+  .preview-workout-btn:active { background: var(--green-light); }
+  .preview-btn-sub { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-light); margin-top: 4px; }
+  .demo-picker { display: flex; gap: 10px; margin-top: 10px; }
+  .demo-pick-btn {
+    flex: 1; padding: 13px 6px; border: none; border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 800; cursor: pointer;
+  }
+  .demo-pick-A { background: var(--green-light); color: var(--green); }
+  .demo-pick-B { background: var(--gold-light); color: #9a6810; }
+  .demo-pick-C { background: var(--blue-light); color: var(--blue); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-greeting" id="headerGreeting">Good morning,</div>
+    <div class="header-name">Sally 👋</div>
+    <div class="header-date" id="headerDate"></div>
+    <div class="header-streak"><span>🔥</span><span id="streakNum">0</span><span>day streak</span></div>
+  </div>
+  <div class="header-avatar-wrap">
+    <img class="header-avatar" id="avatarImg" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD0Sc8YzVSRsE1NNKrOQOtVJSdxr7+C0PxZ6u41nLNnNNJOcmmd8g0vB61fKi1NjOSTTZEyCSOtPwM0rnAIp3sUknuVymOnf2qGVjk89OKtAcHJ6mq0iHcTzjnvRzal+y0uiHzMZPB44zTS+cncB+NEq4P3SPxNQScH/GuinG5x1nyjnlU5AYGowSTy36U3A9+Oppy5L4C549K7YQS1PNqVW3Yfk8c4yaFfbkDvxTXBAztPrmgIx5Ixmt4qLV09DjqTlGVmrMXe54H8qcqHucmnKAufXFL0GPxpS8iYtt6gSF/pVeVyTx0olky2PUUxqwcbHXTkC4xnGaO/NLjnHtTljJOe1ZOx1xbYRk8jGasqpVQzYBzxSxwqEynLEfgKu6Va/aSXIOzPzP3PsK5q1eNOLk9j3Mtyqvi6ipwV2yfSLZ5IyzApGehPU/StOe3iV7QKq4VJMZ/3hTwAFAUBVA4FJJ83lknldw/PFfMYjFOrJyP2nKssp4GhGktX1f8AXQbGqKPlHuaKxvEviTT9ChxcShrllzHAp+Y+59B70V5tXEwjK0nqfY4DK8wrUubDx935L7rmpcIDceYvHGDVeQ8kVYckyMPQ1VnyOK+zP5YihhzSbsZGePWhmxyKjBOc+h/WqSE5WJFPzkj6UHJz64pinAzz0pQcZ9zRY1jIQk5xnnOKa7ZP8hStnlsVAWxzjkcfjS5LmsanKhsysXIUnjjOazrn/WBST1xV25uCo7Z7AUzSoFubncxI29Dx1/GtpVo4ShKtU2RyRoSx+JjhqW8mS2WneZEXlfYg5IXBY1Fd6rZ6eGWK3uMjqVTOPqRn9K0tSD+WUtlLSEYO1goA/mTWG0/kuY726soGPZxuC/XkGvzvMM6xOMk1KVo9lsfrOU8OYPARThG8u73/AOAczrfi17eVbiK1ligl+XzjGyp16ngjP5Vt6DqQvLSOWa8splYEF1+XByOQf6ED0qlcz6Alwc61aLJIMOtsmwEe6k4I+tZUemWsbu+myW0asQyyW4KxkjsV6Lxxxj6Vx0sbXpRtTm0vJnp18rw1eXNVpJvu0rndW0PmRlpiscuflRWzkep/u59Kr3KNExUnOehrFgjnvYPsov0tLuMqBIyllZt33Tjr257fjWoEvba0imuYbdoJP+W9uS6N757H6ivoMs4jr06ijiHzR/LzPkc74Mw1Wk5YSPLNa+T8vIUD581IiAkn0oVDu9TVtYwmB1+nrX29Sqt0fmNCg9miGO3J49smnyRhBk/KMdKuxqAoOOTSx2LXcnz8RA4Y9Mj0FcE8SlrJ6H0WX5VOvNQgrtkWkWj3jl3BW2U4z3c+g9vet5VSNAiAKgGAAKdEqxosaKFVRgAdAKbJjOc8AV8/i8VKq7vbsfsGU5XRwFJQgter7/8AAEILHngelcj4y8Z2+mhrLTHS4vujMOUiPv6n2/OsL4h+KwZJNH0tiMcXE6nH/AFP8z+FcPaMROuFzx6fWvEr4l7RP0zIeHFW5a+J26R7+v8AkWLmGa9u5Li4neaaVsu7HJJord0iGBSxmQuwQsB744H1orj9mnqffXUPdSPWZeN59apytkg4602bUYWhyCQxY8e1RLJ5iRMONy5r9NjTaV2f5/8AtYvRMVyM9KYDzTXyBTYn3OFAzVqJm5O5YIOwY78mkAwoz6ZNWpIsRJj2BNVrl1SRk/hTgn1rOLvsdco8mrGuxHH5VVcjcT2HAPvTZLglycd+KqzzbVKgnjgY/WumNJ3OWVdWY64VmUnrx+VMivY7NoorhvLjmIaPB5ZgeOO9VpJXGVBIBHSk0fTnuNcM04yXXCnrtQen+ep9q8Tiqc6eCjBbOX6H0nBNOnVzGU3vGP5tL8vzH6zLf3qLp2lsbeWc7rif/njH2Qf7R6k1e8P+ENNtl5txcSHlpJRuLHuea1FjhjmkEaBQCFrf0+MIBj8BX5ZUqSlKyP3LC0owgnYxZfCmkSxBZdMgODkHZjBqlc+FdLh+e3tRCynOUJFdysQK7T0qtdQpg7iQOxqbSRv7r0seV6ppognLagzNazkAzKOYXz8r8ds4J/8ArVYhnutFu5rK+IudOu2Kbm6KWOVDe2fut1BIzwa6LXLeOS2kt5EBV0Oa5HVbj7NbQQzqXg4iYt0UjoD7HsfWuuhNyVjzMXSUXdGzpMMotVMkolbHynaB8vbj6VoxQHeHZTjtzTdNVHto2SMRgoPl24AGPStaxtGkYNtO3tX6NTr+zw8FfovyPxyvhvaYupK1vef5le1jUvh844wAPvVpCMooGzbjtjpWrY2MMUavsG8jk1YljUxN24zx3rzK2KU3ofT5XjPqUeVRT8+pgSEJGzucKBk/QV5b4v8AGWr5ms4RHbRuflZAd+z6+9em6xHNJG0NuwUsCM9+nSvEfH2nTab4guUZt0TEFD04IzjHtXl4ys1G8T9b4UjhsTU5p2b6GHITxnJz3rYs4t0ZQdV6H8KxoZAZFyMqDW3p0vy52gHkkCvOpST0Z+q4Zc0k10NXT+bkknjBopmnN8wJHUnv0orqhHQ6ajtI7BXMmDGBu9T0q7A7K8adQOK5i3vp7eVQwIGOTjIrUtdRDyiVCMdCPSv1b2blG6P876kPY1GmbU5/dr6kf1qvC5SdSOMHJpk1yxAUgDpil5KZA6iso02lqTOtrddDTMpZECZINUbuQbjzyWJpLWRipGcYIOT0Aqrv3nPOMZ5qadK0mjariOemn3AtgZ71SkJJxnHYValOB+tVcHJ3d632MotNDVXLj8607SU2cRnU/vHRY1B+p/TrVFFP4nvUt4siPYrHzuZQfp3P64/GvnOMKiWBiv736M+t4ApOWZyf91/mjoNOt7q4vnSNEbHLM7YUfh3NdDFHcWTKJYIp4z9545eQfpXA+Ldcu9I02RrCC4mmfgiBNz59uw68seAOeaxPDt/rs1y3mx3tvcMoMZed2DHqAVYDI9x/9avy1Resj91i9o3PcTG6lccAgdf0rM1K6l+3fY7ezlnbOGfIVQfxqjp+tXT+B3v5YmS7iyjIT3DYHNed67qPiS4QXcf2lpz8yxRsyhF5wTtBJPAOPcVSTehWx2XidLm3tgJ7Ixk4y6uGH446V59rN5FNcm1ZQ53BGXI+ZTgj9at+GPEmu38V1pmuW8vnpjZLIPvKfQ8Z/mD17ZxtTiR9bCgfMAoJxwRgkH8xj8a0orlm0c2J96CZ7BpOlJBZQADKCMbR7YrUhjIOAgAFR2PmJYwRyrtdY1DDOcHHNT78KTX1ibcVc/HZ1m6svV/mT55wKhupCsbL3IxSI565AFQzsGlJrGbsjoWKjSSe5janO8G5tpODx+NeA+JtSudT1me8ujukPGAMBQOAB6V9D6iiPGQwB4Jwa+cNYX/iaTAqVO85HpzXnYjm5bH7J4eYyOJU9NUl+pBaRmSXIWti3BTgE81U01cFiR1FX41zIDjjNZ0qTep+2YOmoUzSsM4UdAM0VNaxlSBjAzmiu+NLQU3qQx3k0kqCU7kzg+2TWtGI7YjaMZbGa5yCQKDkZGeK27eQzFVY5wcnPev1nDq8Ef5/5xS5KzstDainBj+ZskVasZDIzKScY6VkxAiQgjHGKvL5ltKAcZB7dweaudNNWR4F7MvElC5GQAOtR98DjnFV5LktET0UueM9qSCZnck/T86y9k0rsTnZ6E8gzz2PNRspJOecY/KpQvUfhUsEO5jnHpXNOSR30YuSZEkZx0rYsbZLiOFdqmSPDKO+O/61Atvg4IqWz1hLHxJY6Kbc7rmNm84uABkkBQDyeR2r5Xitqrgl5SX6o+44GToZi/OLX4p/oX9BsjcvJ8qjk8kZ6nmtXU9FHkC4vZiyxj5UVQgI9CR1qpHqsGlTy+WVOGYrn0zVHUbvUtUQX321BdsD5avGXiiT/dGMnv6dq/M0rH7hHVJmpbWynwxcw/3g3GODS6PpZ+zRXFu2xmHKsMqfXHp64qnc6hqsGgGxttKW5unGUkR8IxPqeqgemD7Zqlo1/rWmlp74wLIVCywW24p7nnpVWVgWpd8R2D28LSPGrOR1Fec3NnJcazCkAG9yqDPc56V6B4j1+Cazwkgy46f0rldBnth4gsorn5XmuQseFzhlGefTOcfjV0Y81RJdTnxc1ToylLom/uPTickn3NIxAU/Soy3y8CmO3HXrX2dj8P5bK4M2SRRnNRKetPU8VhNHnyneRBeoWQ49DXz54mt2h8RXiODnzX4/4FX0TNwpPtXiPxIiUeLboqB8xVv/AB2uStFNH7R4T1pSxs6VtHG/3P8A4JjaTFuJGOO9aaRDIAFULB1jLAHIIzwOtasBDnjGa0oKKjY/oxXSLiABgSaKQHp65orYztc52M5/77ras2zbDru3EisMEIMYw1aFtKwRVXn2r9TwGsLH8IZ5T5ql0dLaMJUDHG70qxLKZCccc8Vn2cjIY22nB61bU89MV1OHvHx1RWbFKYRSW6npV3T4Q6pIemcYrOuHIRPStfRSDaoCQGXJI7+1c+KbjC5dCmpvUvGACMMfvE4qW2iRdzcDGWP0FOWJuNzHIGTUc0hEhEeM14VSTeiPbhyws2iyp/dlh3APPWodOt9PufE+n3l9bLLJaCQQSkn92zIQD78+vSoCX/iY/TNLDE2Rt6561xYmhCtSlTnszqwuPq4avGrS0s/v8jTOmW1zczSTMMqTJHnpyehHf1rnLe412fxLc6Zq/iiy0WESf6A8Nnn7VGRx82ThgeCv0NdNAHSSOSUZRmI/A9fyPNVX0+3u7to7mITRhjtOM4r8rq0pYerKnNao/oPAYuGNw8K1N6Nfd/XU6O98PalHpNuF8babF5UYPmNbKpkJY/eJbgY5zxXmV9q3jGPxLZ6VpOq6J4hgmLfaZwpAtFG3lmBwc5IA5PFd/NoVobbBSExkdCgz/OsS2soLO7MVtEkYd8nA60OcUjsjGVtXf5JEup6HZWUlvdMdxCyTMO2cYGB9TTINH0SbxRo00rMmrWOnG4MKnCuGkIDv6lSWA+vtU888eoa3HZ7h5YGAuf4I+W/NsCtRNNsf7aOs+QPt5tvspmyf9UG37cdOp616eU4a96rPjeKcdKLjhot3s2/nov1LzfXpUTnP509un1NRE8mvebPzvEKUI2AdM09TimCnRqSRiuecjloYWdSSSV7kN3Jsj5PevF/He8645cY7Z9QK9d18+XablLFxyFHSvIPFwkkv/MfuxHFcdWTs7H7/AOFeWzpVHWa0atr6mRbfI3fFaMRbAZHCsB1qiiEH09qkUkdDxU0p2P3uNPQ2IJS6rnhs80VTgmyTkdBRXWpXMJUddDKkU7uM/nWno/7yVQSRzis9sfKMVbs2MTbhwMciv1fL42P4Ozp86t1OrhVUVQO1PkGTnOMVmRXDBOGwBTprtsdO1d/sm2fEuhLmJpWZ7yOIDK4ycV0mhQfvirjBBAIPauf0uKR3WRx94HA74rq9PYjzrhgMEAAk99oFeXmFSycUd+FoXmr9C2Sfs+4cEjFUwjAEnGSKssxEAjHXqeKY3IVc8kV4TdjunC7I44yTwOSa0LW3CrlupNSW8AUcgZqxjCgBeT2rz69e+iOulh+XWRBqhIsCUOGVgV+oBrJtNTtklUzkor/eU8Z+nrVa48QJeapqmnfu0TTpEUYOTMGXlvTGSR+FSrZQ31oFaNJNvJDDrxx+NfnOb4qNTFvl2Wh+28J4OphsvjGpu7v7zo73xDpSWIw6bccetcRquvbZ3KZjd/8AVr/GfoO31Nbln4T0tohJJY5YjkhiMGmR+H7GCaSWO0VAOSnXcR0z7V57rLsfSq1jO8ApLL4jnnn4cWxG3+4MgAflXfbduMCvM7bWT4cvJNSkgE0TSIkyhsEI8iqWHuM5x3wa9QCZbB7cV9DldVOhZdGfFZ3hHPGcyW6RX3HcN36UigMcEYq6kPmHnoPSphZxA/xAj3rtlWSOGlwvicVJS05fMox2x6evPJzUwg2CrUaFRgkH3pHFc0qr2Pr8Dw1haPv8vveZzHiPcqDb3PNedeILYzXG6TA3EkcV6jrcXmYAHTpXEa3bF2ACgkDGa1pPmVj9K4dpUsHBQgjz2dShII5oA5FaWq2Uw/eBeDwR3H1rNwQc461Dg4SP0ClNTjdEkbfMO1FEDED/AOtRW8VdCnuVZcBgo7CpYWy6Ln5d3NQSn5yfXNWLeMbS2ckAGv1zAvlP4JzJJ6snnuSrFYxk9yaiaaaYks5GBgBTgCgxs2cdfWnRR+Wox948Zr0VGdR67HjWpwWm52+nxPsV9hwqDOB7Voq7iJQE5Cg/Tio9MKKiFlwRGfmB9q5H4h+PrPwtH/Z9tEl5qhXcImJEcQI4Lkck/wCyPxxXyuNxVPDxcqj0KwmDrYyqqdFXbO+hZ3jJyWKgcAcmo7uaG3Ae5uIIF25LSSKuFHU8noPWvM9S8W3MnhbxLeXl4UCW2lajYL9pWBmgcp5ixKoO5i4ZSc4GRkcU74+6jBZaDpk1h5Cx6jpTWbvHl50bME3lO5wOQCH2jOSAQAcV8fX4hvK1OH3n2VDgpv3q9X5Jfq/8jstS+JmixamNI0KJtb1E/KfKcJAvA+YyHO4DOTtBq5NqmszW22443jlbeLYuMdAWOcfjXi3wRsRYfEnRZW1XSrqO+jlhKRXG5wShOCpAP3h+h/H6Uu7aPakKIv7sDG0cjn+VfK5nmdeUuROyt0Puck4fwNCPPyc0l1ev/APJfFFney3cWp6ZatBe2g+6w2rOndG/I4Ndt4I1ux1mzjurbgtmOWFx80TjqpHqOfr1rqXtbNkbzo0ZiPmzwue5rgNW0R9J19fFOiSw21vuVdSjdGKSx5wZAqgneo/ugk14V+f3X8j6m3I+aPzPRNKjQlkaRs/wjdx+ApmtRrZ6ZcPHkfuyAw5rAn1r7LdBLqE2t5GF3xhvMC5QNgOvG4A8jtz3BxB4x8STL4deXT7SW7mJWKJUiYp5hxtBJ47qcZzz70/Zyvaw/aQfvX0OI8WQDUfGllo1uSYtPCXF+QeA+cxoffOD9K9P0zxVpzyW1tqMptppn8tZXGImkPRSf4Se2eCeM5wK4zwnpFzaaZIk6rPe3bNNczFtxZj17VevdFnaGW3lhjljf5W54YY9/auzD4t0ZWjsYSw6n70lqeoxgAYAwBxzTiefc9a8Q8JfELUfCupP4V8SXMVylm6qLiRjvaJlLqdxON4VW+U9dpx2r1O28VaBPNa2/wDalrFPdxCW3R5VxKp7owO1uvQHPPSvY9oparqd+GxdGXu3s10NrtSNyKDkYFIx4qT0EjO1CPPPOBycVyN3sa9ePj6+9dbrE3lQMQcHafyrhrqQq5Y9W5ya68MtbnuZZBtNlDVoLdEdGbcxzkDpXFXURWTg468YrrNTkYrvIPXrXOXo+bK8dD7muuouZan2mXXjHVlTy8BSCc0VNbsWYswyB0oqYwVjqqVLMzMBsEHrWjpsO9GHoOaz4RwPrxWxpm6Nd2Mhhmv1zBwdj+CM0qe9YDDtJUjAUUwRFnwAT6CtQqoG8jnimWkTy30UY4VnGfpkV6XtbRPChJuTRv6hqdloGlC+1GURQiSOEuRkBnYLnHoOSfYGvmXxEbl9cvDeXCXFx5zeZKj71ds8kHuK9c+PbXd/piWmnAzw6d/pV+iAkpvyEJ9cKHY+g5PFeLE5brnNfj2f4t18U4J6R0+fX/I/UOGMCsPhPate9PX5dP8AP5novw9eO+1HQNKW28OQf2zp93oc0l8jOsjby0UjBQCkuXRVYHnaM4FdF4R8Oa94y+C1mkFxNrmp+H9W3WGmxmLy4LdSBMZSw5yFO1WIBHODk15r4AuJv+ElTTUeELfxSWq+djYjuAUbngHzEj546c8V7t8CtQU/ErxbpDy2r6fqsMerwW8Vw8VrGJwJG6YICrIFPGcp044+cqXjqj6unqeYQ6CPBvx00W1thdPYSXsM1nPKEH2mJ+N67Pl2kk4HUDGa+p9uxmmXrg5zxXzZ4hhuY/GPw2Elylx9l/0B1QgoktvdOrAEAbsja2e4I5PNfRyy5aTc5G4ALhcYOOx7/SvLzB+9G/Y9fL1aMku5mXRmN4DuV4+hXn5vX+lWspaxKJLd5V4Uq3zbs+oFWYliW33NEwyT8y8DI5NULubD4BIyfkx6dRnueD615zPVWuhi6l4e0yW8nnsdQn064lR4mltZG+ZZAQ4wTwSCwz15PrUGjeGbK1uYzeX99fNG6SeW8mUDIhVXx3bDEZOTyfw1WgnOZJWTaFyFxy3qTjr1pwt28kSW7ySGNSxVgOB6+9Wqk2rX0F7GCfNbUt30axQSXNuuxIxkEDgcY5qGGRzbefIj5YBwH5OcccehwKZZzSXCMjqScYO49QefxP0/Gn6tu+xuWBTEYwN3ChcevbrVLYJHgPi+7a3+OECOlndtd3lkxim/49pcl0YOdpIGJCMgHHocUr6jdSfALVtH1CK+jn0fVVtrXETSwNGJD5iiTYQuzkffGRtOPXnPiHdCD4j2l0ZVijAXc+OFUswb8ME17B4AsrbXfgp400STxDBotlNqF2zYZZUMZ2T/ALkEoQCNq7SWB64GcV7dN2pRfofOV0/bTRyngL4j67pKr4ai1g3F0x8iGDUF8zyZhjCpKBtKPyAGxtJXJ61v6L8SfE+tvbvBqqJbyuVJSzjVgQpYqQSSDgelcp8TNIW3+N3hnZLb29rfR6bNE1va7HiUbNxkXGWkBBJJGT0PSsHwPqf2TRfEmvQfZt1nf20/kC3IURSzFGCPnjIbAQ54XdkEcmJp1KlNunKzsXQxtWDUHJ29T6Y1G6ebR7WWRsyS28bt9SuTXPXpXBORwOa1rl1fTbXa2U8hNh9Rt4rjtXvSLmRAcAHtXrYeyjqfreV0W6UUJqswKmFSeOeK564B35YnnpWpIzE7j1NU7hDuyBz6V1KPMj6OhP2asUYywwcZA9aKtRQHdgjjPIorSNPQ0lWjfUx4SPNCcjnAH1roIcQ2i5Gd3y/Qms6KyP2vLLhVfPT8cVsCFZItj9mGB3r9dpwVNan8B47EKrNNFhoiBjBPGansIW+2RORznj9aVZVV0WTnC9ce9UPGerpo/h2/v4yC6QMsZPd2+Vf1OfwrlxFf2VKU5bJNmWEw0q9SMY7tpGb4V01PGXxLvY/7WktGa7tns7OW2Kyz/upYdwYjAi8ve4cBjyflPfw7V4Vt9evbVMbIbmWNcDAwrkDGAPT0H0FbmlP4u1zQbvWbCyury50EpeS6xFcN9pt4I0WNUODnYmFYEDK5J6E1z1+jR6xOkjOzbyWZ/vMTzk+5zn8a/FZzlUqSqS3buftlOnGlSjTjtFWIYiRcllVWK8gMMgkdiD1HtXra6hM3j7wZ4k8HSwR/b7gaabZIMLBslUmHYzE+X5cigEkZCHGMZryOD/j4P412WgXEL+BNYhiIXVdMvbbWbRfs+/zETMUwZv4VUNG2P4uRzxiJK5cHY77xWIIfjpf2srXE3m6vFrFrPOixh1eA7yqYBIZtpBBwQmcHrXsVpfie2Qby+B83BOK8G+L9/eN4o8LeP5pp54NV0+G5QFRtjKYEsUfPKgscZA5J64yev0z4weBotPhV7zUd+AWVbJjj9cV5OMoTqcrir6Hs4KvThFxm7anp26RgqRyEAHl2GenfFS2djGz/AL3ne3ybWJJJ9a53wv4o8M+IYW/sbVLa6kZceSX2SrjkfIxB9uh61uRGWJQ6dF4JU8ZIxj+deZKEou0ketCakrxZet0YyKoUhyONw5Bz6/T6dKdOk5ZUYiN+N2/HGOnPf+tLpIV9p3hSWPTr+Wfar1/CsNvvEhaUvjr0X39T/OmlpcHLWxzpTyZGLYRyfm4yv1A696q6wJl06VWd3ypChvvYHv8Aj3rem8oxmMxLnA3Y5OfX2P0rI1qWxtbX/Tb60s4WUkNNMsa/+PEU0m9EDklqz5X+KbmTxN5gOG8vII7Hcfyr2fwJr6ap8E/HFvBd2Ec89s90ba6UDiWII2GG1Q26NwPTA4FeMfEi+0rUfELT6Tcx3EATaWTON2e2QOK6j4baiE8Ha1Z2hkS/udA1CwT5AVkZWFyigDkttMhBPTZxnOB79OH7mKaPm60068rPRlL4yarfWPxw168t76aWewufs9vO7/MipCI1wRjoCcEdeveufnjis/h5YtbaqGe/vnS7sBAFKCDJikL9WB81sDoMH0FXPi3JbTfEjWZbW8W9SSSNmnS489XkMMe/bJ/EN24A+grM8R2MtponhyeSz8o3dnNLG+4kzILiRQ2Og5DAY9Oa6IrRHK3qz6F8C3Mr/CjwvcyuWMlk6DJ/55yun8gKy5WL3cjPzkk//Wq/oVld6N8K/C1leFfNhivhx3BnDL1/3qz2++QPYmu6jrFM/ZuFakquW05S31X3Ow9mJOOMY7U9ohySee1RgfMc4xVorl8dq7qex79TS1iqAN/1op20lxiit1YltC3EAjiDjOOvrg1HBKPOCk9Tz7VamcMCP4T1qoQI9pGM9Bx296/U03bU/wA/6E+aykXDg9B24riPitrVhp8FhZXumpqMMzNLLbmd4vlGFBDIQc8tjtkAkHGK7SIMY8gFl49zXhfxT1Iaj4pnZH3QwnyI8dCF6n8Tk18vxRivY4J076ydvlu/68z7fhvCqpi1U6RV/wBF/XkN8ORapo7wa54d1WS3urufyLOGJyJ5AxKkMpAEicshIyMjlVDLnb8Y6fcah4I0HxNPaSLqFjcTaFq7hQEUwKgtdwz98xhlJAwdgJOSc8loN9dx2wsU1C9t41l+12qQANi6UYRsZBUnpuByOCQcV3Xwg1DTtX1XV/B3iPVRaad4pjiWTUZ2GLa5jbzFlwwwWYgpnKn5uozX5i9NT9FWp5xD/r8+9W1laJn2870ZGG4jII9j9DjpwKbqdlJp2s3lhKwZ7W5khZgMBtrFc/jjP40j/eFXck9JtjJ4t+AkqfZ5Jr3wXdqzS7ztWwnJGMHjIk9OipknoK8l8sI7IQAVYivUf2eru2X4hjQr+0jvLPX7WbTWglbahkdCYmJPAww64YjPAziuB8S6VeaH4ivtH1CMpdWczwTAj+NGKnr64z+NRHRtFS1SZnq5Rw6kqynKsDgg+x7V7Z8LPi4xkt9E8VNuZiscGobsYPQCb17DePx9a8TKjPpTCCOevrSq0YVY2kXQxE6MrxZ9y6BerHqLWjYfCZJIwfX+eKsS3L3F07A5OMAMenYnjqa+dfgV411WXU5dN1K+kuoba1zbtIcuiqQCu7qVAI69MV6Trnjm18NeBrzXJJIGvZVZbKF8/vpj0yBztHU+31r5+rh5xqezR9JTrwnS9tsjmvjT8WLvRL6bw34eKx3sQAurwqCYmIzsQd2GeWPToBkZHz/e3U97cNcXk8lzOxJaSZy7E/U5NLf3lzqmo3Oo3sgkuLmZppXxgM7HJOB7np2qEfUj6V71ChGjGy3PncRiJ1pXexZt4ZvszXRhkEDSeWJNh2FgoJXPTOCDj0IrU8H3w03xXpN6wTZDews+4cbd4DfhtJrpLm3vbX4A6RJMluLS/wDElzNAwnIlLRwLG2YyMFfRweDkEHIxwhJ7de1ap3RjsaOvI8PiDUraR0kaC7lhLqAA2xygPHHIXPv1roXuNP1BfAmm3c8IhtXeK7dZt4WOS6EpUqQNrBWYEZIPHIwQOb1SItrkggVpDcFJUVEJJMiK2AOTnLYxXY674ce4tpB/askP/CM+HYLu5truBkCu7IfKj5PzM8pOSAOB68J20GeqXFle6HGnha5mE32BpbtCrZSGK5kYxRKOu1ViPYYyabsxI2eSMV5V8Mdd1K58UJBf309159sYN0rljhSzqMnk8s5/4Ea9eCfvGHbArtwkfdsz9b4QxMJZYkuja/G/6kSocNkVZRMzfRulSrCdhBGSa3tK0hruQM42QgjLAcn2FdvNY7szzmjg6bqVXZIxdJ0+a7nCIhOGwT2FFeh2ljb2i7LeIIM5Pc0VV2z8rzPxAxVSu3hlaPnueaX8BjulCLiM9M1Wkh/elGBwiFmIPVf8nFbmpIphfgccgVlwlM5HUjaT+NfpdCs6lK5/N2XRVdK+jMPxTqf9k+HLm+yVdE2xAnrIeF/nn8K+fdTYl4yTknPNemfGXV/P1KDR4jhIB502O8jdB+C/+hV5/wCILS0WytbqzvvtD7B9qheExtA5OMDkiRf9oY9wOK/O+Jcd9ZxfItoafPr/AJfI/XshwSw+G5nvLX5dP8/mZwGYceuat2U1xaTRXVrI0VxDIJYZF6o6nKt+BANVx/q1pVmQKQzYx3r509s9L8e+GdU1jwzefF+6keKDWtSVo7Zoi7vvysk7uoCRqZVbavcEY6c8A4AAY1oaN4vvb3RZ/CmpvdanZrb7NJR7qXbp8wfeDHGDtYP8yEFSfmG0jHOe7B7csvpmkr9RtoLaaS3u4rmJiksUiyIw6qykEH8wK6X4tX1vrmtWHia209bEapYwyXCRoFja5UGK4ZFBOFMkZIyc85PWuXHUe4pspMitHknj5Rnp3p21C5XbGajII6flTlcMAeaYT14P41RJLp9xc2V6lxbSzW8q5AkicqeeDyKm1a4uLoxm5uri5KjavmOWIHXAz0FVkOZkDDvmiWTLkAHjjIpWV7lcztYRQdvPHsKUjHJbgUm7OAfT0p8aiR9pwRglvp3piPTPiVplppXww8AQNp+vadqZtJpbiK+idbeYSEP58JJKfMSuQuDgLuGcE+a5wa3PEuoa3eTx2utXtxcSWuQqSuT5e4KSMdjgLx2wBxWJN8rAVMVZDepuJJ9kutH1feUElpJGrp95ZokeIdOQc+UQffPat749i9X4hXtpcxtG+m2Fjayr5BhICwR/fXcedzAdSDwfc8fe3hl0rTNOGzbCZ34JzukZeueBwi9Ox5rS8a+ZaeNdXttYh1Z9t15E63s+bvbHt+Vn6F8KozyAMYzxStqMZ4IuPsXiLTrtgRGs6qzY4GeP619F2MYlmZSOuOa+abvULi62vtjhRPmjghBWOM9flXPHNfT/AISkS80yyvIiHFzbxup9yAT+ua78I90fW8O5l9Ww1an10a/J/ob2kaSJSSyjy88k9a6ZYkiRUjUALwMdhUNhEIbYJ3HX61b25612Rpvdn55n2dVMZWfNL3VsMY4ziiq2qXaxJ5SH52HPsKK6IUHJXPmJYrXQ4nU0Hlb88AfNWNNLBbWr3MzbYY0MjknoACTRRX3OFqyWGlLtf8j5DI/39OMZ9HY8KuNeTULi/m1TS7a8a7k8xZtzRzQ+gRxxjGBhgR9DzXPTTJDPDPNAlzHG/wC8ibgOp4Iz24Jwexwe1FFfk0m5Nye7P2pJRVl0GzRw72W2klaH/lm0ihXI9wCRn6Vl3KspIJOfc0UVIE3h+6uNN1K31Czle3u7WaO4glXhkdGDKw+hANdd42u7bUddOt291ZyvrUf2+7t7W3MKWdw7HzYQpJ4Dcg55z0FFFFuoGAGOORytJC2bgGiimhFG5JiupI8nrkD61Y0izudU1S106yXzLq5kWGFWlVAzscAbmIUZPckUUUMdid9KuINPgvpp7dfOmlhWJZN8gMe3czAcBSWABz82CRwM1nTq4Yk/nRRSTG0IsgDDDHjpk1oacu6N5Sow3yj3FFFMRamklnmaaaR5JG+8zsWY9uSeTVK8PIPvRRTGLZRW09yi3k3lWyqzzEH5mUdVTPVj0HufarHibVrrW9Vk1G8JMs7lj6ZPJ/p+AFFFIBg+5j2r3n9nDU2vNGl013BexmBUHrsYEj9QaKK6cK7VUbUZuHNbqn+R7jb5MQz3zSaldm1T5ACxJxmiivchFSlZn53jm05WOfuJHkk3OcluaKKK7rHkps//2Q==" alt="Sally">
+    <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(event)">
+    <span class="avatar-tap-hint" onclick="document.getElementById('avatarInput').click()">tap to change</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPanel('today')" id="nav-today"><span class="ni">💪</span>TODAY</button>
+  <button class="nav-btn" onclick="showPanel('plan')" id="nav-plan"><span class="ni">📋</span>PLAN</button>
+  <button class="nav-btn" onclick="showPanel('history')" id="nav-history"><span class="ni">📊</span>HISTORY</button>
+  <button class="nav-btn" onclick="showPanel('reminders')" id="nav-reminders"><span class="ni">🔔</span>REMINDERS</button>
+  <button class="nav-btn" onclick="showPanel('tips')" id="nav-tips"><span class="ni">💡</span>TIPS</button>
+</nav>
+
+<!-- TODAY PANEL -->
+<div class="panel active" id="panel-today">
+  <div id="todayContent"></div>
+</div>
+
+<!-- PLAN PANEL -->
+<div class="panel" id="panel-plan">
+  <div class="panel-title">Weekly Plan 📋</div>
+
+  <!-- Schedule overview strip -->
+  <div style="background:white;border-radius:var(--radius);padding:16px 18px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+    <div style="font-size:0.8rem;font-weight:800;color:var(--text-light);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;">Your Weekly Schedule</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;">
+      <div style="font-size:0.65rem;font-weight:800;color:var(--text-light);padding:4px 0;">MON</div>
+      <div style="font-size:0.65rem;font-weight:800;color:var(--text-light);padding:4px 0;">TUE</div>
+      <div style="font-size:0.65rem;font-weight:800;color:var(--text-light);padding:4px 0;">WED</div>
+      <div style="font-size:0.65rem;font-weight:800;color:var(--text-light);padding:4px 0;">THU</div>
+      <div style="font-size:0.65rem;font-weight:800;color:var(--text-light);padding:4px 0;">FRI</div>
+      <div style="font-size:0.65rem;font-weight:800;color:var(--text-light);padding:4px 0;">SAT</div>
+      <div style="font-size:0.65rem;font-weight:800;color:var(--text-light);padding:4px 0;">SUN</div>
+      <div style="background:var(--green);color:white;border-radius:8px;padding:8px 2px;font-size:0.7rem;font-weight:800;">A</div>
+      <div style="background:var(--green-light);color:var(--text-light);border-radius:8px;padding:8px 2px;font-size:0.7rem;font-weight:800;">REST</div>
+      <div style="background:var(--gold);color:white;border-radius:8px;padding:8px 2px;font-size:0.7rem;font-weight:800;">B</div>
+      <div style="background:var(--green-light);color:var(--text-light);border-radius:8px;padding:8px 2px;font-size:0.7rem;font-weight:800;">REST</div>
+      <div style="background:var(--blue);color:white;border-radius:8px;padding:8px 2px;font-size:0.7rem;font-weight:800;">C</div>
+      <div style="background:var(--green-light);color:var(--text-light);border-radius:8px;padding:8px 2px;font-size:0.7rem;font-weight:800;">REST</div>
+      <div style="background:var(--green-light);color:var(--text-light);border-radius:8px;padding:8px 2px;font-size:0.7rem;font-weight:800;">REST</div>
+    </div>
+  </div>
+
+  <!-- MONDAY / WORKOUT A -->
+  <div style="background:white;border-radius:var(--radius);margin-bottom:14px;box-shadow:var(--shadow-sm);overflow:hidden;">
+    <div style="background:linear-gradient(90deg,var(--green),#1a6e40);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="color:white;font-size:1.05rem;font-weight:900;">Monday</div>
+        <div style="color:rgba(255,255,255,0.75);font-size:0.8rem;font-weight:600;margin-top:2px;">Workout A · Lower Body & Core</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.2);color:white;font-size:0.75rem;font-weight:800;padding:5px 12px;border-radius:20px;">Workout A</div>
+    </div>
+    <div style="padding:4px 0 8px;">
+      <div class="ref-row ref-warmup"><span class="ref-icon">🌡</span><div><div class="ref-name">Treadmill Warm-Up</div><div class="ref-detail">5 min easy walk</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🦵</span><div><div class="ref-name">Leg Press</div><div class="ref-detail">3 sets × 10–12 reps · start 30 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🦵</span><div><div class="ref-name">Seated Leg Extension</div><div class="ref-detail">2 sets × 10–12 reps · start 15 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🦵</span><div><div class="ref-name">Seated Leg Curl</div><div class="ref-detail">2 sets × 10–12 reps · start 15 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🍑</span><div><div class="ref-name">Hip Abductor Machine</div><div class="ref-detail">2 sets × 12–15 reps · start 20 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🧘</span><div><div class="ref-name">Ab Crunch Machine</div><div class="ref-detail">2 sets × 12–15 reps · start 15 lbs</div></div></div>
+      <div class="ref-row ref-cooldown"><span class="ref-icon">🧊</span><div><div class="ref-name">Cool-Down Walk + Stretch</div><div class="ref-detail">5 min walk + quad, hamstring & hip stretch</div></div></div>
+    </div>
+  </div>
+
+  <!-- WEDNESDAY / WORKOUT B -->
+  <div style="background:white;border-radius:var(--radius);margin-bottom:14px;box-shadow:var(--shadow-sm);overflow:hidden;">
+    <div style="background:linear-gradient(90deg,var(--gold),#c87010);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="color:white;font-size:1.05rem;font-weight:900;">Wednesday</div>
+        <div style="color:rgba(255,255,255,0.8);font-size:0.8rem;font-weight:600;margin-top:2px;">Workout B · Upper Body Push & Pull</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.2);color:white;font-size:0.75rem;font-weight:800;padding:5px 12px;border-radius:20px;">Workout B</div>
+    </div>
+    <div style="padding:4px 0 8px;">
+      <div class="ref-row ref-warmup"><span class="ref-icon">🌡</span><div><div class="ref-name">Treadmill Warm-Up</div><div class="ref-detail">5 min easy walk</div></div></div>
+      <div class="ref-row"><span class="ref-icon">💪</span><div><div class="ref-name">Seated Chest Press</div><div class="ref-detail">3 sets × 10–12 reps · start 20 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🔙</span><div><div class="ref-name">Lat Pulldown</div><div class="ref-detail">3 sets × 10–12 reps · start 25 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🔙</span><div><div class="ref-name">Seated Cable Row</div><div class="ref-detail">2 sets × 10–12 reps · start 25 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🙆</span><div><div class="ref-name">Shoulder Press Machine</div><div class="ref-detail">2 sets × 10–12 reps · start 15 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">💪</span><div><div class="ref-name">Bicep Curl Machine</div><div class="ref-detail">2 sets × 12 reps · start 15 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">💪</span><div><div class="ref-name">Tricep Pressdown</div><div class="ref-detail">2 sets × 12 reps · start 15 lbs</div></div></div>
+      <div class="ref-row ref-cooldown"><span class="ref-icon">🧊</span><div><div class="ref-name">Cool-Down Walk + Stretch</div><div class="ref-detail">5 min walk + chest, tricep & shoulder stretch</div></div></div>
+    </div>
+  </div>
+
+  <!-- FRIDAY / WORKOUT C -->
+  <div style="background:white;border-radius:var(--radius);margin-bottom:14px;box-shadow:var(--shadow-sm);overflow:hidden;">
+    <div style="background:linear-gradient(90deg,var(--blue),#2a508a);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="color:white;font-size:1.05rem;font-weight:900;">Friday</div>
+        <div style="color:rgba(255,255,255,0.8);font-size:0.8rem;font-weight:600;margin-top:2px;">Workout C · Balance, Glutes & Full Body</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.2);color:white;font-size:0.75rem;font-weight:800;padding:5px 12px;border-radius:20px;">Workout C</div>
+    </div>
+    <div style="padding:4px 0 8px;">
+      <div class="ref-row ref-warmup"><span class="ref-icon">🌡</span><div><div class="ref-name">Stationary Bike Warm-Up</div><div class="ref-detail">5 min easy, low resistance</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🍑</span><div><div class="ref-name">Glute Bridge / Hip Thrust</div><div class="ref-detail">3 sets × 12–15 reps · bodyweight to start</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🦶</span><div><div class="ref-name">Seated Calf Raise</div><div class="ref-detail">2 sets × 15 reps · start 25 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🔙</span><div><div class="ref-name">Cable Straight-Arm Pulldown</div><div class="ref-detail">2 sets × 12 reps · start 15 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🦵</span><div><div class="ref-name">Single-Leg Press</div><div class="ref-detail">2 sets × 10 reps each leg · start 20 lbs</div></div></div>
+      <div class="ref-row"><span class="ref-icon">🔙</span><div><div class="ref-name">Back Extension Machine</div><div class="ref-detail">2 sets × 10–12 reps · bodyweight to start</div></div></div>
+      <div class="ref-row ref-cooldown"><span class="ref-icon">🧊</span><div><div class="ref-name">Cool-Down Walk + Full Stretch</div><div class="ref-detail">5 min walk + full body stretch, 30 sec each</div></div></div>
+    </div>
+  </div>
+
+  <!-- REST DAYS -->
+  <div style="background:white;border-radius:var(--radius);margin-bottom:14px;box-shadow:var(--shadow-sm);overflow:hidden;">
+    <div style="background:linear-gradient(90deg,#7a907a,#5a6e5a);padding:14px 18px;">
+      <div style="color:white;font-size:1.05rem;font-weight:900;">Tue · Thu · Sat · Sun</div>
+      <div style="color:rgba(255,255,255,0.75);font-size:0.8rem;font-weight:600;margin-top:2px;">Rest & Recovery Days</div>
+    </div>
+    <div style="padding:14px 18px;">
+      <div class="ref-row" style="border:none;"><span class="ref-icon">🌿</span><div><div class="ref-name">No gym today</div><div class="ref-detail">Your muscles are rebuilding and getting stronger</div></div></div>
+      <div class="ref-row" style="border:none;"><span class="ref-icon">🚶</span><div><div class="ref-name">Optional: gentle walk</div><div class="ref-detail">Keeps things loose without overdoing it</div></div></div>
+      <div class="ref-row" style="border:none;padding-bottom:0;"><span class="ref-icon">💧</span><div><div class="ref-name">Stay hydrated</div><div class="ref-detail">6–8 glasses of water throughout the day</div></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- HISTORY PANEL -->
+<div class="panel" id="panel-history">
+  <div class="panel-title">Your Progress</div>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-num" id="statStreak">0</div><div class="stat-label">🔥 Day Streak</div></div>
+    <div class="stat-box"><div class="stat-num" id="statTotal">0</div><div class="stat-label">💪 Total Workouts</div></div>
+    <div class="stat-box"><div class="stat-num" id="statWeek">0</div><div class="stat-label">📅 This Week</div></div>
+  </div>
+  <div id="calendarContent"></div>
+  <div style="margin-top:20px;">
+    <div class="panel-title" style="font-size:1.1rem;">Recent Workouts</div>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<!-- REMINDERS PANEL -->
+<div class="panel" id="panel-reminders">
+  <div class="panel-title">Reminders 🔔</div>
+
+  <div class="notif-card">
+    <h3>🏋️ Gym Day Reminders</h3>
+    <div class="notif-row">
+      <div>
+        <div class="notif-row-label">Monday workout</div>
+        <div class="notif-row-sub">Lower Body & Core</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="time" class="time-picker" id="time-mon" value="09:00">
+        <button class="toggle" id="toggle-mon" onclick="toggleNotif('mon')"></button>
+      </div>
+    </div>
+    <div class="notif-row">
+      <div>
+        <div class="notif-row-label">Wednesday workout</div>
+        <div class="notif-row-sub">Upper Body Push & Pull</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="time" class="time-picker" id="time-wed" value="09:00">
+        <button class="toggle" id="toggle-wed" onclick="toggleNotif('wed')"></button>
+      </div>
+    </div>
+    <div class="notif-row">
+      <div>
+        <div class="notif-row-label">Friday workout</div>
+        <div class="notif-row-sub">Balance, Glutes & Full Body</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="time" class="time-picker" id="time-fri" value="09:00">
+        <button class="toggle" id="toggle-fri" onclick="toggleNotif('fri')"></button>
+      </div>
+    </div>
+    <div class="notif-status" id="notifStatus"></div>
+    <div class="notif-note">
+      💡 <strong>How it works:</strong> When you turn on a reminder, your phone will ask permission to send notifications. Tap <strong>"Allow"</strong> — then you'll get a reminder at the time you choose on that day each week. If a reminder ever stops working, just toggle it off and back on.
+    </div>
+  </div>
+
+  <div class="notif-card">
+    <h3>💧 Daily Water Reminder</h3>
+    <div class="notif-row">
+      <div>
+        <div class="notif-row-label">Drink water reminder</div>
+        <div class="notif-row-sub">Daily nudge to stay hydrated</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="time" class="time-picker" id="time-water" value="10:00">
+        <button class="toggle" id="toggle-water" onclick="toggleNotif('water')"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TIPS PANEL -->
+<div class="panel" id="panel-tips">
+  <div class="panel-title">Tips & Guidance</div>
+  <div class="tip-card">
+    <h3>🌅 Before You Start</h3>
+    <ul>
+      <li>Drink a glass of water before leaving home</li>
+      <li>Wear supportive, closed-toe sneakers</li>
+      <li>Let Bay Club staff know you're new — they love helping!</li>
+      <li>Never skip the warm-up, even if you feel great</li>
+    </ul>
+  </div>
+  <div class="tip-card">
+    <h3>⚙️ Using the Machines</h3>
+    <ul>
+      <li><strong>Always adjust the seat first</strong> — good alignment protects your joints</li>
+      <li>Start lighter than you think — you can always go heavier next week</li>
+      <li>Move slowly and with control — no jerking or dropping weights</li>
+      <li>Breathe <strong>out</strong> on the push or pull, <strong>in</strong> on the way back</li>
+      <li>Rest 60–90 seconds between sets — this is not wasted time!</li>
+    </ul>
+  </div>
+  <div class="tip-card">
+    <h3>💛 Good to Know</h3>
+    <ul>
+      <li>Mild muscle soreness 1–2 days after is completely normal</li>
+      <li>If something feels sharp in a joint, skip it today</li>
+      <li>Strength training improves bone density, balance & energy</li>
+      <li>3 days a week is perfect — rest days are when you get stronger!</li>
+    </ul>
+  </div>
+  <div class="tip-card">
+    <h3>🥗 Food & Recovery</h3>
+    <ul>
+      <li>Have a protein snack within 1 hour after training (yogurt, eggs, cheese)</li>
+      <li>Aim for 6–8 glasses of water throughout the day</li>
+      <li>Sleep is when muscles rebuild — aim for 7–8 hours</li>
+      <li>A gentle walk on rest days keeps things loose without overdoing it</li>
+    </ul>
+  </div>
+  <div class="tip-card">
+    <h3>🏆 Remember This</h3>
+    <p>Getting yourself to the gym is the biggest win. Every single rep you complete is building a stronger, more independent future. You are doing something remarkable — be proud every single time you walk through those doors. 💚</p>
+  </div>
+</div>
+
+<!-- REST TIMER FAB -->
+<button class="timer-fab" id="timerFab" onclick="openTimer()">
+  <span class="timer-fab-icon">⏱</span>
+  <span class="timer-fab-label" id="timerFabLabel">REST</span>
+</button>
+
+<!-- TIMER MODAL -->
+<div class="timer-modal" id="timerModal" onclick="closeTimerIfBg(event)">
+  <div class="timer-sheet">
+    <h2>⏱ Rest Timer</h2>
+    <p class="timer-sub">Take a break between sets</p>
+    <div class="timer-display" id="timerDisplay">1:00</div>
+    <div class="timer-phase" id="timerPhase">Ready to start</div>
+    <div class="timer-presets">
+      <button class="timer-preset-btn active-preset" onclick="setTimerPreset(60,this)">1 min</button>
+      <button class="timer-preset-btn" onclick="setTimerPreset(90,this)">1:30</button>
+      <button class="timer-preset-btn" onclick="setTimerPreset(120,this)">2 min</button>
+    </div>
+    <div class="timer-controls">
+      <button class="timer-btn timer-btn-reset" onclick="resetTimer()">Reset</button>
+      <button class="timer-btn timer-btn-start" id="timerStartBtn" onclick="toggleTimer()">Start</button>
+    </div>
+    <button class="timer-close" onclick="closeTimer()">Close</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// WORKOUT PROGRAM DATA
+// ============================================================
+const PROGRAM = {
+  A: {
+    name:'Lower Body & Core', tag:'Workout A',
+    exercises:[
+      {id:'a1',name:'Treadmill Warm-Up',machine:'Treadmill',section:'warmup',sets:1,reps:'5 min walk',defaultWeight:'No incline',single:true,tip:'Walk at a comfortable pace (about 2.0–2.5 mph). Stand tall, swing your arms gently.'},
+      {id:'a2',name:'Leg Press',machine:'Leg Press Machine',section:'main',sets:3,reps:'10–12 reps',defaultWeight:'30 lbs',tip:'<strong>Seat tip:</strong> Knees at 90° when platform is close. Press through your whole foot. Don\'t lock knees at the top.'},
+      {id:'a3',name:'Seated Leg Extension',machine:'Leg Extension Machine',section:'main',sets:2,reps:'10–12 reps',defaultWeight:'15 lbs',tip:'Strengthens the front of your thighs. Extend slowly and lower with control — don\'t let the weight drop.'},
+      {id:'a4',name:'Seated Leg Curl',machine:'Seated Leg Curl Machine',section:'main',sets:2,reps:'10–12 reps',defaultWeight:'15 lbs',tip:'Works the back of your thighs. Pull the pad toward you and hold for a beat at the top.'},
+      {id:'a5',name:'Hip Abductor',machine:'Hip Abductor Machine',section:'main',sets:2,reps:'12–15 reps',defaultWeight:'20 lbs',tip:'Sit tall and press your knees apart. Great for glutes and hip stability. Go slow and controlled.'},
+      {id:'a6',name:'Ab Crunch Machine',machine:'Seated Ab Crunch Machine',section:'main',sets:2,reps:'12–15 reps',defaultWeight:'15 lbs',tip:'Exhale and pull belly in as you crunch. No neck strain! Core strength protects your back.'},
+      {id:'a7',name:'Cool-Down Walk + Stretch',machine:'Treadmill / Stretch area',section:'cooldown',sets:1,reps:'5 min + stretch',defaultWeight:'Bodyweight',single:true,tip:'Slow walk at 1.5 mph for 5 min, then: quad stretch, hamstring stretch, seated hip stretch. Hold each 30 seconds.'},
+    ]
+  },
+  B: {
+    name:'Upper Body Push & Pull', tag:'Workout B',
+    exercises:[
+      {id:'b1',name:'Treadmill Warm-Up',machine:'Treadmill',section:'warmup',sets:1,reps:'5 min walk',defaultWeight:'No incline',single:true,tip:'Walk at a comfortable pace. Roll your shoulders back and take deep breaths to prepare your upper body.'},
+      {id:'b2',name:'Seated Chest Press',machine:'Chest Press Machine',section:'main',sets:3,reps:'10–12 reps',defaultWeight:'20 lbs',tip:'<strong>Seat tip:</strong> Handles at chest height. Push straight out, keep your back flat on the pad.'},
+      {id:'b3',name:'Lat Pulldown',machine:'Lat Pulldown Machine',section:'main',sets:3,reps:'10–12 reps',defaultWeight:'25 lbs',tip:'Sit with thighs under the pad. Pull the bar to your upper chest. Squeeze shoulder blades together at the bottom.'},
+      {id:'b4',name:'Seated Cable Row',machine:'Seated Row Machine',section:'main',sets:2,reps:'10–12 reps',defaultWeight:'25 lbs',tip:'Sit tall. Pull handles to your lower ribs with elbows close to sides. Builds posture-correcting muscles.'},
+      {id:'b5',name:'Shoulder Press Machine',machine:'Shoulder Press Machine',section:'main',sets:2,reps:'10–12 reps',defaultWeight:'15 lbs',tip:'Adjust seat so handles start at shoulder height. Press up slowly. Helps with reaching and everyday lifting.'},
+      {id:'b6',name:'Bicep Curl Machine',machine:'Seated Bicep Curl Machine',section:'main',sets:2,reps:'12 reps',defaultWeight:'15 lbs',tip:'Keep elbows on the pad throughout. Curl all the way up, lower slowly. Feel the front of your upper arm working.'},
+      {id:'b7',name:'Tricep Pressdown',machine:'Cable Machine + Rope',section:'main',sets:2,reps:'12 reps',defaultWeight:'15 lbs',tip:'Face the machine, elbows close to sides. Push the rope down until arms are straight. Works the back of your arm.'},
+      {id:'b8',name:'Cool-Down Walk + Stretch',machine:'Treadmill / Stretch area',section:'cooldown',sets:1,reps:'5 min + stretch',defaultWeight:'Bodyweight',single:true,tip:'5-min slow walk then: chest doorway stretch, overhead tricep stretch, cross-body shoulder stretch. 30 seconds each.'},
+    ]
+  },
+  C: {
+    name:'Balance, Glutes & Full Body', tag:'Workout C',
+    exercises:[
+      {id:'c1',name:'Stationary Bike Warm-Up',machine:'Stationary Bike or Elliptical',section:'warmup',sets:1,reps:'5 min easy',defaultWeight:'Low resistance',single:true,tip:'Whichever feels comfortable on your knees. Easy pace — just warming up and getting blood flowing.'},
+      {id:'c2',name:'Glute Bridge / Hip Thrust',machine:'Hip Thrust Machine or Mat',section:'main',sets:3,reps:'12–15 reps',defaultWeight:'Bodyweight',tip:'Push through your heels and squeeze your glutes at the top. Hold for 1 second. Excellent for balance and stability.'},
+      {id:'c3',name:'Seated Calf Raise',machine:'Seated Calf Raise Machine',section:'main',sets:2,reps:'15 reps',defaultWeight:'25 lbs',tip:'Press up onto your toes and hold for 1 second at the top. Strong calves improve balance and reduce fall risk.'},
+      {id:'c4',name:'Cable Straight-Arm Pulldown',machine:'Cable Machine',section:'main',sets:2,reps:'12 reps',defaultWeight:'15 lbs',tip:'Stand facing cable, arms straight, pull bar down to hips. Works upper back and improves shoulder stability.'},
+      {id:'c5',name:'Single-Leg Press',machine:'Leg Press Machine',section:'main',sets:2,reps:'10 reps each leg',defaultWeight:'20 lbs',tip:'Much lighter weight than your regular leg press. One leg at a time builds balance and evens out side differences.'},
+      {id:'c6',name:'Back Extension Machine',machine:'Back Extension Machine',section:'main',sets:2,reps:'10–12 reps',defaultWeight:'Bodyweight',tip:'Strengthens lower back and glutes. Move slowly. Only go as far back as feels comfortable — never force it.'},
+      {id:'c7',name:'Cool-Down Walk + Full Stretch',machine:'Treadmill / Stretch area',section:'cooldown',sets:1,reps:'5 min + stretch',defaultWeight:'Bodyweight',single:true,tip:'Slow walk then full-body stretch: quads, hamstrings, calves, chest, shoulders, lower back. 30 seconds each.'},
+    ]
+  }
+};
+
+const DAY_SCHEDULE = {1:'A',3:'B',5:'C'};
+
+// ============================================================
+// STATE
+// ============================================================
+function getState() {
+  try { return JSON.parse(localStorage.getItem('sallyWorkout_v1')||'{}'); }
+  catch(e) { return {}; }
+}
+function saveState(s) { localStorage.setItem('sallyWorkout_v1',JSON.stringify(s)); }
+function dateKey(d) { return d.toISOString().split('T')[0]; }
+function todayKey() { return dateKey(new Date()); }
+
+function getTodaySession() {
+  const s=getState(); const key=todayKey();
+  if(!s.sessions) s.sessions={};
+  if(!s.sessions[key]) s.sessions[key]={sets:{},weights:{},completed:false};
+  return {state:s,session:s.sessions[key],key};
+}
+
+function getWorkoutForDate(d) { return DAY_SCHEDULE[d.getDay()]||null; }
+function getTodayWorkout() { return getWorkoutForDate(new Date()); }
+
+function calcCompletion(session,exercises) {
+  let total=0,done=0;
+  exercises.forEach(ex=>{
+    if(ex.single){total++;if(session.sets[ex.id+'_0'])done++;}
+    else{for(let s=0;s<ex.sets;s++){total++;if(session.sets[ex.id+'_'+s])done++;}}
+  });
+  return {total,done,pct:total>0?Math.round(done/total*100):0};
+}
+
+function calcStreak() {
+  const s=getState(); if(!s.sessions) return 0;
+  let streak=0; let d=new Date();
+  for(let i=0;i<90;i++){
+    const key=dateKey(d); const workout=getWorkoutForDate(d);
+    if(workout){
+      const sess=s.sessions[key];
+      if(sess&&sess.completed) streak++;
+      else if(i>0) break;
+    }
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+
+function calcTotalWorkouts() {
+  const s=getState(); if(!s.sessions) return 0;
+  return Object.values(s.sessions).filter(sess=>sess.completed).length;
+}
+
+function calcThisWeek() {
+  const s=getState(); if(!s.sessions) return 0;
+  const now=new Date(); const startOfWeek=new Date(now);
+  startOfWeek.setDate(now.getDate()-now.getDay()); startOfWeek.setHours(0,0,0,0);
+  return Object.entries(s.sessions).filter(([key,sess])=>sess.completed&&new Date(key)>=startOfWeek).length;
+}
+
+// Returns the weight Sally used for an exercise in her most recent
+// completed session (skipping today), so she knows where to start.
+function getLastWeight(exId) {
+  const s = getState();
+  if (!s.sessions) return null;
+  // First check fast global weight history store
+  if (s.weightHistory && s.weightHistory[exId]) {
+    // But only show it if it's from a PREVIOUS session (not today)
+    const todaySess = s.sessions[todayKey()];
+    if (!todaySess || !todaySess.weights || !todaySess.weights[exId]) {
+      return s.weightHistory[exId];
+    }
+  }
+  // Fall back: scan past sessions newest-first
+  const todayK = todayKey();
+  const pastKeys = Object.keys(s.sessions)
+    .filter(k => k !== todayK)
+    .sort((a, b) => b.localeCompare(a));
+  for (const k of pastKeys) {
+    const sess = s.sessions[k];
+    if (sess && sess.weights && sess.weights[exId]) {
+      return sess.weights[exId];
+    }
+  }
+  return null;
+}
+
+// ============================================================
+// RENDER TODAY
+// ============================================================
+let demoWorkoutKey = null; // null = real mode, 'A'/'B'/'C' = demo mode
+
+function enterDemo(key) { demoWorkoutKey = key; renderToday(); window.scrollTo(0,0); }
+function exitDemo() { demoWorkoutKey = null; renderToday(); window.scrollTo(0,0); }
+
+function renderToday() {
+  const content=document.getElementById('todayContent');
+  const realWorkoutKey=getTodayWorkout();
+  const workoutKey = demoWorkoutKey || realWorkoutKey;
+  const {state,session,key}=getTodaySession();
+
+  // Header updates
+  const now=new Date();
+  const h=now.getHours();
+  const greeting=h<12?'Good morning,':h<17?'Good afternoon,':'Good evening,';
+  document.getElementById('headerGreeting').textContent=greeting;
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('headerDate').textContent=`${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+  document.getElementById('streakNum').textContent=calcStreak();
+
+  if(!workoutKey){
+    content.innerHTML=`<div class="rest-card">
+      <div class="big-emoji">🌿</div>
+      <h2>Rest Day</h2>
+      <p>Today is your recovery day. Your muscles are rebuilding and getting stronger right now. Stay hydrated, enjoy a gentle walk, and rest — you've earned it!</p>
+      <div style="margin-top:20px;font-size:0.88rem;font-weight:700;color:var(--text-light);">Next workout: <span style="color:var(--green);">${getNextWorkoutDay()}</span></div>
+    </div>
+    <button class="preview-workout-btn" onclick="this.nextElementSibling.style.display='flex'">
+      👀 Preview a workout day
+      <span class="preview-btn-sub">See exactly what Monday, Wednesday or Friday looks like</span>
+    </button>
+    <div class="demo-picker" style="display:none;">
+      <button class="demo-pick-btn demo-pick-A" onclick="enterDemo('A')">💪 Monday<br><span style="font-size:0.72rem;font-weight:600;">Lower Body</span></button>
+      <button class="demo-pick-btn demo-pick-B" onclick="enterDemo('B')">🏋️ Wednesday<br><span style="font-size:0.72rem;font-weight:600;">Upper Body</span></button>
+      <button class="demo-pick-btn demo-pick-C" onclick="enterDemo('C')">⚖️ Friday<br><span style="font-size:0.72rem;font-weight:600;">Balance & Glutes</span></button>
+    </div>`;
+    document.getElementById('timerFab').classList.remove('visible');
+    return;
+  }
+
+  document.getElementById('timerFab').classList.add('visible');
+  const workout=PROGRAM[workoutKey];
+  const {total,done,pct}=calcCompletion(session,workout.exercises);
+  const colorMap={A:'var(--green)',B:'var(--gold)',C:'var(--blue)'};
+  const bgMap={A:'var(--green-light)',B:'var(--gold-light)',C:'var(--blue-light)'};
+  const dayMap={A:'Monday',B:'Wednesday',C:'Friday'};
+
+  let html='';
+
+  // Demo mode banner
+  if(demoWorkoutKey){
+    html+=`<div class="demo-banner">
+      <span>👀 PREVIEW</span> This is what ${dayMap[demoWorkoutKey]} looks like — nothing is saved
+      <button class="demo-exit-btn" onclick="exitDemo()">✕ Exit</button>
+    </div>`;
+  }
+
+  if(session.completed && !demoWorkoutKey) html+=`<div class="celebrate-card show"><div class="big-emoji">🎉</div><h2>Workout Complete!</h2><p>Amazing work today, Sally. You showed up and got it done — that's what matters!</p></div>`;
+
+  html+=`<div class="today-header">
+    <div><div class="today-title">${workout.name}</div><div class="today-subtitle">Bay Club · Carmel Valley</div></div>
+    <div class="workout-tag" style="color:${colorMap[workoutKey]};background:${bgMap[workoutKey]};">${workout.tag}</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-top"><span class="progress-bar-label">Today's Progress</span><span class="progress-bar-pct">${done} / ${total} sets</span></div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+  </div>`;
+
+  let lastSection='';
+  workout.exercises.forEach(ex=>{
+    if(ex.section!==lastSection){
+      const labels={warmup:'🌡 Warm-Up',main:'💪 Main Workout',cooldown:'🧘 Cool-Down'};
+      html+=`<div class="section-label">${labels[ex.section]||''}</div>`;
+      lastSection=ex.section;
+    }
+    const weight=session.weights[ex.id]||ex.defaultWeight;
+    const lastWeight=getLastWeight(ex.id);
+    const sectionDone=ex.single?!!session.sets[ex.id+'_0']:Array.from({length:ex.sets},(_,i)=>!!session.sets[ex.id+'_'+i]).every(Boolean);
+
+    // Build "last time" badge — only show for weighted exercises that have history
+    let lastWeightHtml='';
+    if(lastWeight && !ex.single){
+      const isSame = lastWeight === weight;
+      const cls = isSame ? 'last-weight same' : 'last-weight heavier';
+      const icon = isSame ? '📌' : '📈';
+      lastWeightHtml=`<div class="${cls}">${icon} Last time: <strong>${lastWeight}</strong></div>`;
+    }
+
+    html+=`<div class="ex-card section-${ex.section} ${sectionDone?'all-done':''}" id="card_${ex.id}">
+      <div class="ex-name">${ex.name}</div>
+      <div class="ex-machine">${ex.machine}</div>
+      <div class="ex-meta">
+        ${!ex.single?`<span class="pill pill-sets">📦 ${ex.sets} sets</span>`:''}
+        <span class="pill pill-reps">🔁 ${ex.reps}</span>
+        <span class="pill pill-weight" onclick="toggleWeightEdit('${ex.id}')">⚖️ ${weight}</span>
+      </div>
+      ${lastWeightHtml}
+      <div class="weight-edit-row" id="weightEdit_${ex.id}">
+        <label>Weight:</label>
+        <input type="text" class="weight-input" id="weightInput_${ex.id}" value="${weight}" placeholder="e.g. 30 lbs">
+        <button class="weight-save-btn" onclick="saveWeight('${ex.id}')">Save</button>
+      </div>`;
+
+    if(ex.single){
+      const checked=!!session.sets[ex.id+'_0'];
+      html+=`<div class="single-check ${checked?'checked':''}" id="single_${ex.id}" onclick="toggleSingle('${ex.id}')">
+        <div class="single-check-box"></div>
+        <span class="single-check-label">${checked?'Done! ✓':'Tap when finished'}</span>
+      </div>`;
+    } else {
+      html+=`<div class="set-checks">`;
+      for(let s=0;s<ex.sets;s++){
+        const checked=!!session.sets[ex.id+'_'+s];
+        html+=`<div class="set-check ${checked?'checked':''}" id="setcheck_${ex.id}_${s}" onclick="toggleSet('${ex.id}',${s})">
+          <div class="set-box"></div><span class="set-check-label">Set ${s+1}</span>
+        </div>`;
+      }
+      html+=`</div>`;
+    }
+    if(ex.tip) html+=`<div class="ex-tip">${ex.tip}</div>`;
+    html+=`</div>`;
+  });
+
+  content.innerHTML=html;
+}
+
+function getNextWorkoutDay(){
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  let d=new Date();
+  for(let i=1;i<=7;i++){d.setDate(d.getDate()+1);if(getWorkoutForDate(d))return days[d.getDay()];}
+  return 'Soon';
+}
+
+// ============================================================
+// INTERACTIONS
+// ============================================================
+function toggleSet(exId,setIndex){
+  if(demoWorkoutKey){ flashDemo(); return; }
+  const {state,session,key}=getTodaySession();
+  session.sets[exId+'_'+setIndex]=!session.sets[exId+'_'+setIndex];
+  const workoutKey=getTodayWorkout();
+  if(workoutKey){
+    const workout=PROGRAM[workoutKey];
+    const {total,done}=calcCompletion(session,workout.exercises);
+    if(done===total&&!session.completed) session.completed=true;
+  }
+  state.sessions[key]=session;
+  saveState(state);
+  renderToday();
+}
+function toggleSingle(exId){toggleSet(exId,0);}
+
+function flashDemo(){
+  // Brief toast to let her know this is just a preview
+  let toast=document.getElementById('demoToast');
+  if(!toast){
+    toast=document.createElement('div');
+    toast.id='demoToast';
+    toast.style.cssText='position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:#1a2e1a;color:white;padding:10px 20px;border-radius:30px;font-family:Nunito,sans-serif;font-size:0.85rem;font-weight:700;z-index:500;opacity:0;transition:opacity 0.2s;white-space:nowrap;';
+    toast.textContent='👀 Preview only — nothing is saved';
+    document.body.appendChild(toast);
+  }
+  toast.style.opacity='1';
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>toast.style.opacity='0', 1800);
+}
+
+function toggleWeightEdit(exId){
+  const row=document.getElementById('weightEdit_'+exId);
+  row.classList.toggle('show');
+  if(row.classList.contains('show')) document.getElementById('weightInput_'+exId).focus();
+}
+function saveWeight(exId){
+  const val=document.getElementById('weightInput_'+exId).value.trim();
+  if(!val)return;
+  const {state,session,key}=getTodaySession();
+  session.weights[exId]=val;
+  // Also save to a global weight history so "last time" works across any session
+  if(!state.weightHistory) state.weightHistory={};
+  state.weightHistory[exId]=val;
+  state.sessions[key]=session;
+  saveState(state);
+  document.getElementById('weightEdit_'+exId).classList.remove('show');
+  renderToday();
+}
+
+// ============================================================
+// RENDER HISTORY
+// ============================================================
+function renderHistory(){
+  const streak=calcStreak(),total=calcTotalWorkouts(),week=calcThisWeek();
+  document.getElementById('statStreak').textContent=streak;
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('statWeek').textContent=week;
+  document.getElementById('streakNum').textContent=streak;
+  const s=getState(); const sessions=s.sessions||{};
+  const now=new Date(); let calHtml='';
+  for(let m=0;m<=1;m++){
+    const md=new Date(now.getFullYear(),now.getMonth()-m,1);
+    calHtml+=`<div class="cal-month-label">${md.toLocaleString('default',{month:'long',year:'numeric'})}</div>`;
+    calHtml+=`<div class="calendar-grid">`;
+    ['S','M','T','W','T','F','S'].forEach(d=>calHtml+=`<div class="cal-day-name">${d}</div>`);
+    const firstDay=md.getDay();
+    const daysInMonth=new Date(md.getFullYear(),md.getMonth()+1,0).getDate();
+    for(let i=0;i<firstDay;i++) calHtml+=`<div class="cal-day"></div>`;
+    for(let day=1;day<=daysInMonth;day++){
+      const d=new Date(md.getFullYear(),md.getMonth(),day);
+      const key=dateKey(d); const isToday=key===todayKey();
+      const isFuture=d>now; const workoutDay=getWorkoutForDate(d);
+      const sess=sessions[key]; const isDone=sess&&sess.completed;
+      let cls='cal-day';
+      if(isFuture)cls+=' future';
+      else if(isDone)cls+=' workout-done';
+      else if(!workoutDay)cls+=' rest-day';
+      if(isToday)cls+=' today';
+      calHtml+=`<div class="${cls}">${day}</div>`;
+    }
+    calHtml+=`</div>`;
+  }
+  document.getElementById('calendarContent').innerHTML=calHtml;
+  const allKeys=Object.entries(sessions).filter(([,sess])=>sess.completed).sort(([a],[b])=>b.localeCompare(a)).slice(0,10);
+  let histHtml=allKeys.length===0?`<div style="text-align:center;padding:30px;color:var(--text-light);font-weight:700;">No completed workouts yet.<br>You've got this, Sally! 💪</div>`:'';
+  allKeys.forEach(([key])=>{
+    const d=new Date(key+'T12:00:00'); const wk=getWorkoutForDate(d);
+    const workout=wk?PROGRAM[wk]:null;
+    histHtml+=`<div class="history-entry">
+      <div class="history-entry-info">
+        <h4>${workout?workout.tag+': '+workout.name:'Workout'}</h4>
+        <p>${d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</p>
+      </div><div style="font-size:1.4rem;">✅</div>
+    </div>`;
+  });
+  document.getElementById('historyList').innerHTML=histHtml;
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+const notifSchedule={
+  mon:{day:1,label:'Monday gym reminder'},
+  wed:{day:3,label:'Wednesday gym reminder'},
+  fri:{day:5,label:'Friday gym reminder'},
+  water:{day:-1,label:'Daily water reminder'}
+};
+
+function loadNotifState(){
+  const s=getState();
+  if(!s.notifs) s.notifs={};
+  Object.keys(notifSchedule).forEach(key=>{
+    const saved=s.notifs[key];
+    if(saved){
+      const toggle=document.getElementById('toggle-'+key);
+      if(toggle&&saved.on) toggle.classList.add('on');
+      const timePicker=document.getElementById('time-'+key);
+      if(timePicker&&saved.time) timePicker.value=saved.time;
+    }
+  });
+}
+
+async function toggleNotif(key){
+  const toggle=document.getElementById('toggle-'+key);
+  const isOn=toggle.classList.contains('on');
+
+  if(!isOn){
+    // Request permission
+    if(!('Notification' in window)){
+      showNotifStatus('⚠️ Your browser doesn\'t support notifications. Try opening this app in Safari on your iPhone.',true);
+      return;
+    }
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){
+      showNotifStatus('⚠️ Notifications were not allowed. Please go to iPhone Settings → Safari → Notifications and allow this site.',true);
+      return;
+    }
+    toggle.classList.add('on');
+    saveNotifPref(key,true);
+    scheduleNotif(key);
+    showNotifStatus(`✅ Reminder set! You'll get a notification at the time you chose.`);
+  } else {
+    toggle.classList.remove('on');
+    saveNotifPref(key,false);
+    showNotifStatus('🔕 Reminder turned off.');
+  }
+}
+
+function saveNotifPref(key,on){
+  const s=getState();
+  if(!s.notifs) s.notifs={};
+  const timePicker=document.getElementById('time-'+key);
+  s.notifs[key]={on,time:timePicker?timePicker.value:'09:00'};
+  saveState(s);
+}
+
+function scheduleNotif(key){
+  const timePicker=document.getElementById('time-'+key);
+  if(!timePicker) return;
+  const [h,m]=timePicker.value.split(':').map(Number);
+  const info=notifSchedule[key];
+  const now=new Date();
+  let target=new Date();
+  target.setHours(h,m,0,0);
+
+  if(info.day===-1){
+    // Daily — fire today if time hasn't passed, otherwise tomorrow
+    if(target<=now) target.setDate(target.getDate()+1);
+  } else {
+    // Weekly — find next occurrence of that day
+    let daysUntil=(info.day-now.getDay()+7)%7;
+    if(daysUntil===0&&target<=now) daysUntil=7;
+    target.setDate(target.getDate()+daysUntil);
+  }
+  const delay=target-now;
+  if(delay>0&&delay<2147483647){
+    setTimeout(()=>{
+      const s=getState();
+      if(s.notifs&&s.notifs[key]&&s.notifs[key].on){
+        new Notification(info.label,{
+          body:"Time to hit the Bay Club, Sally! 💪 Let's go!",
+          icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💪</text></svg>'
+        });
+        // Reschedule for next week
+        scheduleNotif(key);
+      }
+    },delay);
+  }
+}
+
+function showNotifStatus(msg,isWarn=false){
+  const el=document.getElementById('notifStatus');
+  el.textContent=msg;
+  el.style.background=isWarn?'#fef3dc':null;
+  el.style.color=isWarn?'#8a6010':null;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),5000);
+}
+
+// Re-schedule any active notifications on page load
+function reloadNotifs(){
+  const s=getState();
+  if(!s.notifs) return;
+  if(Notification.permission==='granted'){
+    Object.entries(s.notifs).forEach(([key,val])=>{
+      if(val.on) scheduleNotif(key);
+    });
+  }
+}
+
+// ============================================================
+// AVATAR UPLOAD
+// ============================================================
+function handleAvatarUpload(event){
+  const file=event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const dataUrl=e.target.result;
+    document.getElementById('avatarImg').src=dataUrl;
+    const s=getState();
+    s.customAvatar=dataUrl;
+    saveState(s);
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadAvatar(){
+  const s=getState();
+  if(s.customAvatar){
+    document.getElementById('avatarImg').src=s.customAvatar;
+  }
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+let timerInterval=null,timerSeconds=60,timerRunning=false,timerInitial=60;
+
+function setTimerPreset(secs,btn){
+  document.querySelectorAll('.timer-preset-btn').forEach(b=>b.classList.remove('active-preset'));
+  btn.classList.add('active-preset');
+  resetTimerTo(secs);
+}
+function resetTimerTo(secs){
+  clearInterval(timerInterval); timerRunning=false;
+  timerSeconds=secs; timerInitial=secs;
+  document.getElementById('timerStartBtn').textContent='Start';
+  document.getElementById('timerPhase').textContent='Ready to start';
+  updateTimerDisplay();
+}
+function openTimer(){document.getElementById('timerModal').classList.add('show');}
+function closeTimer(){document.getElementById('timerModal').classList.remove('show');}
+function closeTimerIfBg(e){if(e.target===document.getElementById('timerModal'))closeTimer();}
+function toggleTimer(){
+  if(timerRunning){
+    clearInterval(timerInterval); timerRunning=false;
+    document.getElementById('timerStartBtn').textContent='Resume';
+    document.getElementById('timerPhase').textContent='Paused';
+  } else {
+    timerRunning=true;
+    document.getElementById('timerStartBtn').textContent='Pause';
+    document.getElementById('timerPhase').textContent='Resting…';
+    timerInterval=setInterval(()=>{
+      timerSeconds--;
+      if(timerSeconds<=0){
+        timerSeconds=0; clearInterval(timerInterval); timerRunning=false;
+        document.getElementById('timerStartBtn').textContent='Start';
+        document.getElementById('timerPhase').textContent='✅ Rest complete! Time for your next set.';
+        document.getElementById('timerFabLabel').textContent='DONE';
+        if(navigator.vibrate) navigator.vibrate([200,100,200,100,200]);
+      }
+      updateTimerDisplay();
+    },1000);
+  }
+}
+function resetTimer(){resetTimerTo(timerInitial);document.getElementById('timerFabLabel').textContent='REST';}
+function updateTimerDisplay(){
+  const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+  const display=`${m}:${s.toString().padStart(2,'0')}`;
+  document.getElementById('timerDisplay').textContent=display;
+  document.getElementById('timerFabLabel').textContent=timerRunning?display:'REST';
+  document.getElementById('timerDisplay').classList.toggle('warning',timerSeconds<=10&&timerSeconds>0);
+}
+
+// ============================================================
+// NAV
+// ============================================================
+function showPanel(name){
+  demoWorkoutKey=null;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='today') renderToday();
+  if(name==='history') renderHistory();
+  if(name==='reminders') loadNotifState();
+  const wk=getTodayWorkout();
+  document.getElementById('timerFab').classList.toggle('visible',name==='today'&&!!wk);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadAvatar();
+renderToday();
+reloadNotifs();
+</script>
+</body>
+</html>
